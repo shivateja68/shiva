@@ -22,3 +22,27 @@ def htop():
 
 if _name_ == '_main_':
     app.run(host='0.0.0.0', port=8080)
+
+    from django.http import HttpResponse
+import os
+from datetime import datetime
+import subprocess
+
+def htop_view(request):
+    full_name = "Your Full Name"
+    username = os.getlogin()  # System username
+    server_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S IST')  # IST time
+    top_output = subprocess.check_output(['top', '-b', '-n', '1']).decode('utf-8')  # 'top' command output
+
+    response = f"<h1>Name: {full_name}</h1>"
+    response += f"<p>Username: {username}</p>"
+    response += f"<p>Server Time in IST: {server_time}</p>"
+    response += f"<pre>{top_output}</pre>"
+
+    return HttpResponse(response)
+from django.urls import path
+from htop_app.views import htop_view
+
+urlpatterns = [
+    path('htop/', htop_view),
+]
